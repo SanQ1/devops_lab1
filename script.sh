@@ -121,9 +121,8 @@ ExecStart=$GUNICORN_PATH --workers 2 app:app
 Restart=always
 EOF
 
-# Перезавантажуємо systemd та запускаємо сокет
 sudo systemctl daemon-reload
-sudo systemctl reset-failed mywebapp.service mywebapp.socket
+sudo systemctl reset-failed mywebapp.service mywebapp.socket || true
 sudo systemctl enable --now mywebapp.socket
 
 echo "=== Етап 7: Налаштування Nginx як Reverse Proxy ==="
