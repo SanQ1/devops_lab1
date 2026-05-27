@@ -154,5 +154,5 @@ sudo chown student:student /home/student/gradebook
 sudo chmod 644 /home/student/gradebook
 
 echo "======================================================="
-echo " РОЗГОРТАННЯ ЗАВЕРШЕНО УСПІШНО!                       "
+echo " РОЗГОРТАННЯ ЗАВЕРШЕНО УСПІШНО!                        "
 echo "======================================================="
