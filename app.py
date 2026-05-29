@@ -1,18 +1,20 @@
 import sys
 import argparse
 import mysql.connector
+import os
+import time
 from flask import Flask, request, jsonify, render_template_string
 from datetime import datetime
 
 app = Flask(__name__)
 
-# ПАРСИНГ АРГУМЕНТІВ КОМАНДНОГО РЯДКА
+# ПАРСИНГ АРГУМЕНТІВ КОМАНДНОГО РЯДКА ТА ЗМІННИХ ОТОЧЕННЯ
 parser = argparse.ArgumentParser(description="MyWebApp: Simple Inventory Service")
-parser.add_argument('--port', type=int, default=8000, help="Порт застосунку")
-parser.add_argument('--db-host', type=str, default='localhost', help="Хост MariaDB")
-parser.add_argument('--db-user', type=str, default='inventory_user', help="Користувач MariaDB")
-parser.add_argument('--db-password', type=str, default='password123', help="Пароль MariaDB")
-parser.add_argument('--db-name', type=str, default='inventory_db', help="Назва бази даних")
+parser.add_argument('--port', type=int, default=int(os.environ.get('APP_PORT', 8000)), help="Порт застосунку")
+parser.add_argument('--db-host', type=str, default=os.environ.get('DB_HOST', 'localhost'), help="Хост MariaDB")
+parser.add_argument('--db-user', type=str, default=os.environ.get('DB_USER', 'inventory_user'), help="Користувач MariaDB")
+parser.add_argument('--db-password', type=str, default=os.environ.get('DB_PASSWORD', 'password123'), help="Пароль MariaDB")
+parser.add_argument('--db-name', type=str, default=os.environ.get('DB_NAME', 'inventory_db'), help="Назва бази даних")
 
 args, unknown = parser.parse_known_args()
 
@@ -31,24 +33,32 @@ def get_db_connection():
 
 # СКРИПТ МІГРАЦІЇ БАЗИ ДАНИХ
 def run_migrations():
-    """Автоматично створює таблицю для інвентарю при старті."""
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS inventory_items (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                quantity INT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        """)
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print("Міграцію бази даних успішно виконано.")
-    except Exception as e:
-        print(f"Критична помилка міграції: {e}", file=sys.stderr)
+    """Автоматично створює таблицю для інвентарю при старті з механізмом повторних спроб."""
+    print("Очікування готовності бази даних для виконання міграцій...")
+    retries = 10
+    while retries > 0:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS inventory_items (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    quantity INT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            conn.commit()
+            cursor.close()
+            conn.close()
+            print("Міграцію бази даних успішно виконано.")
+            return
+        except Exception as e:
+            retries -= 1
+            print(f"База даних ще не готова (очікування портів). Спроб залишилось: {retries}. Помилка: {e}")
+            time.sleep(3)
+            
+    print("Критична помилка: Не вдалося підключитися до БД для виконання міграцій!", file=sys.stderr)
 
 # Запускаємо міграцію одразу при ініціалізації застосунку
 run_migrations()
