@@ -12,8 +12,10 @@ app = Flask(__name__)
 parser = argparse.ArgumentParser(description="MyWebApp: Simple Inventory Service")
 parser.add_argument('--port', type=int, default=int(os.environ.get('APP_PORT', 8000)), help="Порт застосунку")
 parser.add_argument('--db-host', type=str, default=os.environ.get('DB_HOST', 'localhost'), help="Хост MariaDB")
-parser.add_argument('--db-user', type=str, default=os.environ.get('DB_USER', 'inventory_user'), help="Користувач MariaDB")
-parser.add_argument('--db-password', type=str, default=os.environ.get('DB_PASSWORD', 'password123'), help="Пароль MariaDB")
+parser.add_argument('--db-user', type=str, default=os.environ.get('DB_USER', 'inventory_user'),
+                    help="Користувач MariaDB")
+parser.add_argument('--db-password', type=str, default=os.environ.get('DB_PASSWORD', 'password123'),
+                    help="Пароль MariaDB")
 parser.add_argument('--db-name', type=str, default=os.environ.get('DB_NAME', 'inventory_db'), help="Назва бази даних")
 
 args, unknown = parser.parse_known_args()
