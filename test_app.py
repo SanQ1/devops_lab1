@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 from app import app
 
+
 # Фікстура pytest, яка створює тестового клієнта Flask.
 @pytest.fixture
 def client():
@@ -9,12 +10,14 @@ def client():
     with app.test_client() as client:
         yield client
 
+
 # 1. ТЕСТ ДЛЯ ЕНДПОІНТУ /health/alive
 def test_health_alive(client):
     """Перевіряє, що хелсчек alive завжди повертає статус 200 та текст OK."""
     response = client.get('/health/alive')
     assert response.status_code == 200
     assert response.data.decode('utf-8') == "OK"
+
 
 # 2. ТЕСТ ДЛЯ ЕНДПОІНТУ /health/ready 
 @patch('app.get_db_connection')
@@ -28,6 +31,7 @@ def test_health_ready_success(mock_get_db, client):
     assert response.data.decode('utf-8') == "OK"
     mock_conn.ping.assert_called_once_with(reconnect=True)
 
+
 # 3. ТЕСТ ДЛЯ ЕНДПОІНТУ /health/ready (ПОМИЛКА БД)
 @patch('app.get_db_connection')
 def test_health_ready_failure(mock_get_db, client):
@@ -38,6 +42,7 @@ def test_health_ready_failure(mock_get_db, client):
     assert response.status_code == 500
     assert "Сервіс не готовий" in response.data.decode('utf-8')
 
+
 # 4. ТЕСТ ДЛЯ КОРЕНЕВОГО МАРШРУТУ /
 def test_root_endpoint(client):
     """Перевіряє кореневу HTML-сторінку на наявність правильних заголовків."""
@@ -45,6 +50,7 @@ def test_root_endpoint(client):
     assert response.status_code == 200
     assert "Simple Inventory" in response.data.decode('utf-8')
     assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
+
 
 # 5. ТЕСТ ДЛЯ GET /items 
 @patch('app.get_db_connection')
@@ -67,6 +73,7 @@ def test_get_items_json(mock_get_db, client):
     assert json_data[0]['name'] == "Switch Cisco"
     assert json_data[1]['id'] == 2
 
+
 # 6. ТЕСТ ДЛЯ GET /items 
 @patch('app.get_db_connection')
 def test_get_items_html(mock_get_db, client):
@@ -83,6 +90,7 @@ def test_get_items_html(mock_get_db, client):
     html_content = response.data.decode('utf-8')
     assert "<h1>Список предметів в інвентарі</h1>" in html_content
     assert "<td>Switch Cisco</td>" in html_content
+
 
 # 7. ТЕСТ ДЛЯ POST /items (СТВОРЕННЯ НОВОГО ПРЕДМЕТА ЧЕРЕЗ JSON)
 @patch('app.get_db_connection')

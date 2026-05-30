@@ -26,6 +26,7 @@ db_config = {
     'database': args.db_name
 }
 
+
 def get_db_connection():
     """Функція для підключення до бази даних."""
     return mysql.connector.connect(**db_config)
@@ -57,8 +58,8 @@ def run_migrations():
             retries -= 1
             print(f"База даних ще не готова (очікування портів). Спроб залишилось: {retries}. Помилка: {e}")
             time.sleep(3)
-            
     print("Критична помилка: Не вдалося підключитися до БД для виконання міграцій!", file=sys.stderr)
+
 
 # Запускаємо міграцію одразу при ініціалізації застосунку
 run_migrations()
@@ -69,6 +70,7 @@ run_migrations()
 def health_alive():
     """Завжди повертає HTTP 200 OK з вмістом ОК."""
     return "OK", 200
+
 
 @app.route('/health/ready', methods=['GET'])
 def health_ready():
