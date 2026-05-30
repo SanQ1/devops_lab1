@@ -142,6 +142,7 @@ def manage_items():
 
     else:
         # GET /items - вивести список усіх предметів (тільки id, name)
+        # text
         cursor.execute("SELECT id, name FROM inventory_items")
         items = cursor.fetchall()
         cursor.close()
