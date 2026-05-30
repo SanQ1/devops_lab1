@@ -135,7 +135,7 @@ def manage_items():
         cursor.execute("INSERT INTO inventory_items (name, quantity) VALUES (%s, %s)", (name, quantity))
         conn.commit()
         new_id = cursor.lastrowid
-        
+
         cursor.close()
         conn.close()
         return jsonify({"message": "Запис успішно створено", "id": new_id}), 201
