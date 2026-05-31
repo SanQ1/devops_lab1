@@ -142,7 +142,7 @@ def manage_items():
 
     else:
         # GET /items - вивести список усіх предметів (тільки id, name)
-        # text1
+        # text2
         cursor.execute("SELECT id, name FROM inventory_items")
         items = cursor.fetchall()
         cursor.close()
@@ -158,6 +158,7 @@ def manage_items():
         </table>
         """
         return render_by_accept_header(items, html_template)
+
 
 @app.route('/items/<int:item_id>', methods=['GET'])
 def get_item(item_id):
