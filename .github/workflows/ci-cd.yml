@@ -122,9 +122,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
         run: |
-          # Використовуємо пряме посилання на власника репозиторію у нижньому регістрі
           ssh -o StrictHostKeyChecking=no ${{ secrets.TARGET_USER }}@${{ secrets.TARGET_HOST }} \
-            "GITHUB_TOKEN=\"$GITHUB_TOKEN\" GITHUB_ACTOR=\"$GITHUB_ACTOR\" bash /tmp/deploy.sh ghcr.io/${{ github.repository_owner }}/mywebapp:stable"
+            "GITHUB_TOKEN=\"$GITHUB_TOKEN\" GITHUB_ACTOR=\"$GITHUB_ACTOR\" bash /tmp/deploy.sh ghcr.io/${{ github.repository }}/mywebapp:stable"
 
       - name: Run Deployment Verification
         run: |
